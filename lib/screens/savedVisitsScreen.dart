@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -28,31 +29,18 @@ class SavedVisit extends StatefulWidget {
 
 class _SavedVisitState extends State<SavedVisit> {
   List<SiteVisit> visits;
+  //For syncstatus, 1 is sync not connected, 2 is syncing, 3 is synced
+  List<int> syncStatus;
   String userEmail;
   OnlineDatabase _onlineDatabase;
 
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
-  // PersistentQueue pq =
 
   @override
   void initState() {
     super.initState();
     userEmail = widget._auth2.currentUser.email;
     _onlineDatabase = OnlineDatabase(userEmail);
-    // widget._auth..then((value) => userEmail = value);
-    // _onlineDatabase = OnlineDatabase(userEmail);
-
-    /* pq = PersistentQueue('visitQueue' , onFlush: (list) async {
-    final result = await InternetAddress.lookup('google.com');
-  if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
-    if (list[0] == events[0]) {
-      await _onlineDatabase.addVisit((){
-        for 
-      }
-  
-    }} 
-  // print('auto-flush\n$list');
-}); */
   }
 
   /*  Future getAllVisits() async {
@@ -61,50 +49,6 @@ class _SavedVisitState extends State<SavedVisit> {
     return visits;
   }
  */
-  _screenReturn() {
-    //Displays list of all visits
-    if (visits == null)
-      return SingleChildScrollView(physics: AlwaysScrollableScrollPhysics());
-    else {
-      if (visits.length == 0)
-        return SingleChildScrollView(physics: AlwaysScrollableScrollPhysics());
-      else {
-        return ListView.builder(
-            itemCount: visits != null ? visits.length : 0,
-            itemBuilder: (BuildContext ctxt, int index) {
-              return ListTile(
-                  title: new Text(
-                    visits[index].siteId,
-                    style: TextStyle(fontSize: 16),
-                  ),
-                  subtitle: Container(
-                    child: Text(visits[index].dateofVisit.toIso8601String(),
-                        style: TextStyle(color: Colors.brown, fontSize: 12)),
-                  ),
-                  onTap: () {
-                    openVisitForm(visits[index]);
-                  },
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: <Widget>[
-                      IconButton(
-                        icon: Icon(
-                            visits[index].pending ? Icons.cached : Icons.check),
-                        onPressed: () {},
-                      ),
-                      IconButton(
-                          icon: Icon(
-                            Icons.delete,
-                          ),
-                          onPressed: () {
-                            _onlineDatabase.deleteVisit(visits[index].entryuid);
-                          }),
-                    ],
-                  ));
-            });
-      }
-    }
-  }
 
 /*   Future initialiseDB() async {
     return visitDB.initDb().then((stuff) {
@@ -117,11 +61,9 @@ class _SavedVisitState extends State<SavedVisit> {
   Widget build(BuildContext context) {
     //openVisitForm();
     return StreamBuilder(
-        stream: _onlineDatabase.getVisitsStream(),
+        stream: _onlineDatabase.getVisitsSnapshot(),
         builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
           if (snapshot.hasData) {
-            visits = snapshot.data;
-
             return new Scaffold(
               key: scaffoldKey,
               appBar: AppBar(
@@ -132,12 +74,12 @@ class _SavedVisitState extends State<SavedVisit> {
                     tooltip: 'Add Visit',
                     onPressed: () {
                       //Open the form and update Online database
-                      openVisitForm();
+                      openVisitFormNew();
                       // updateOnlineDatabase();
                     },
                   ),
                   IconButton(
-                    icon: const Icon(Icons.more_horiz),
+                    icon: const Icon(Icons.exit_to_app),
                     tooltip: 'Next page',
                     onPressed: () async {
                       await widget._auth.signOut();
@@ -154,7 +96,7 @@ class _SavedVisitState extends State<SavedVisit> {
                   ),
                 ],
               ),
-              body: _screenReturn(),
+              body: visitListWidget(snapshot),
             );
           } else if (snapshot.hasError)
             return new Text('Error: ${snapshot.error}');
@@ -163,7 +105,78 @@ class _SavedVisitState extends State<SavedVisit> {
         });
   }
 
-  openVisitForm([SiteVisit visitb4]) async {
+  Widget visitListWidget(AsyncSnapshot<dynamic> snapshot) {
+    //Displays list of all visits
+
+    return FutureBuilder(
+        future: setVisitsAndSync(snapshot.data),
+        builder: (context, futureSnap) {
+          switch (futureSnap.connectionState) {
+            case ConnectionState.waiting:
+              return Text("Loading");
+            default:
+              if (!futureSnap.hasError) {
+                if (visits == null)
+                  return SingleChildScrollView(
+                      physics: AlwaysScrollableScrollPhysics());
+                else {
+                  if (visits.length == 0)
+                    return SingleChildScrollView(
+                        physics: AlwaysScrollableScrollPhysics());
+                  else {
+                    return ListView.builder(
+                        itemCount: visits != null ? visits.length : 0,
+                        itemBuilder: (BuildContext ctxt, int index) {
+                          return ListTile(
+                              title: new Text(
+                                visits[index].siteId,
+                                style: TextStyle(fontSize: 16),
+                              ),
+                              subtitle: Container(
+                                child: Text(
+                                    visits[index].dateofVisit.toIso8601String(),
+                                    style: TextStyle(
+                                        color: Colors.brown, fontSize: 12)),
+                              ),
+                              onTap: () {
+                                openVisitFormNew(visits[index]);
+                              },
+                              trailing: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: <Widget>[
+                                  IconButton(
+                                    icon: (syncStatus[index] == null)
+                                        ? Icon(Icons.ac_unit)
+                                        : Icon([
+                                            Icons.cancel,
+                                            Icons.cached,
+                                            Icons.check
+                                          ][syncStatus[index] - 1]),
+                                    onPressed: () {},
+                                  ),
+                                  IconButton(
+                                      icon: Icon(
+                                        Icons.delete,
+                                      ),
+                                      onPressed: () async {
+                                        bool result =
+                                            await yesCancelAlertDialog(context);
+                                        if (result == true)
+                                          _onlineDatabase.deleteVisit(
+                                              visits[index].entryuid);
+                                      }),
+                                ],
+                              ));
+                        });
+                  }
+                }
+              } else
+                return Text('Error' + futureSnap.error.toString());
+          }
+        });
+  }
+
+  openVisitFormNew([SiteVisit visitb4]) async {
     SiteVisit visit = await Navigator.push(
         context,
         MaterialPageRoute(
@@ -335,5 +348,81 @@ class _SavedVisitState extends State<SavedVisit> {
         }
       }
     });
+  }
+
+  Future<bool> setVisitsAndSync(QuerySnapshot snapshot) async {
+    //This sets the sync status and visits
+
+    //For syncstatus, 1 is sync not connected, 2 is syncing, 3 is synced
+
+    // This gets a snapshot of the user's documents
+    List<QueryDocumentSnapshot> currentDocs = snapshot.docs;
+
+    // This converts it to a list of Visits
+    visits = currentDocs.map((doc) => SiteVisit.fromMap(doc.data())).toList();
+    syncStatus = new List(currentDocs.length);
+    print("Inside setVisit stuck");
+    //This creates the sync status
+    for (var i = 0; i < currentDocs.length; i += 1) {
+      //For syncstatus, 1 is sync not connected, 2 is syncing, 3 is synced
+
+      bool fromCache = currentDocs[i].metadata.isFromCache;
+      if (!fromCache) {
+        // SYNC DONE
+        syncStatus[i] = 3;
+      } else {
+        try {
+          final result = await InternetAddress.lookup('google.com');
+          if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
+            // SYNCING...
+            syncStatus[i] = 2;
+          }
+        } on SocketException catch (_) {
+          // WAITING ON CONNECTION...
+          syncStatus[i] = 1;
+        }
+      }
+    }
+
+    // setState(() {});
+    return true;
+    //Future(() => true);
+  }
+
+  Future<bool> yesCancelAlertDialog(BuildContext context) async {
+    // This creates a delete confirmation dialog
+    bool result = false;
+    // set up the buttons
+    Widget cancelButton = FlatButton(
+      child: Text("Cancel"),
+      onPressed: () {
+        Navigator.of(context, rootNavigator: true).pop(false);
+      },
+    );
+    Widget continueButton = FlatButton(
+      child: Text("Yes"),
+      onPressed: () {
+        Navigator.of(context, rootNavigator: true).pop(true);
+      },
+    );
+
+    // set up the AlertDialog
+    AlertDialog alert = AlertDialog(
+      title: Text("Delete Entry"),
+      content: Text("Are you sure?"),
+      actions: [
+        continueButton,
+        cancelButton,
+      ],
+    );
+
+    // show the dialog
+    result = await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
+    return result;
   }
 }

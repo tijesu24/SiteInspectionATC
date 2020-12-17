@@ -1,11 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:sitecheck3/models/site_visit.dart';
+import "dart:io";
+import "package:tuple/tuple.dart";
 
 class OnlineDatabase {
   CollectionReference visitCollection;
   String userEmail;
   OnlineDatabase(this.userEmail) {
-    FirebaseFirestore.instance.settings = Settings(persistenceEnabled: false);
+    FirebaseFirestore.instance.settings = Settings(persistenceEnabled: true);
     initDatabase();
   }
 
@@ -45,17 +47,10 @@ class OnlineDatabase {
     }
   }
 
-  Stream<List<SiteVisit>> getVisitsStream() async* {
+  Stream<QuerySnapshot> getVisitsSnapshot() {
     // To create explanatory comment
 
     // This gets a snapshot of the user's documents
-    Stream<List<QueryDocumentSnapshot>> currentDocs =
-        visitCollection.snapshots().map((event) => event.docs);
-
-    // This converts it to a list of Visits
-    await for (var objs in currentDocs) {
-      var output = objs.map((e) => SiteVisit.fromMap(e.data())).toList();
-      yield output;
-    }
+    return visitCollection.snapshots(includeMetadataChanges: true);
   }
 }
