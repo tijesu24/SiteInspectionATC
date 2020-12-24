@@ -13,7 +13,7 @@ class VisitSyncStatus {
   static const SYNCING = 2;
   static const UPLOADED = 3;
 
-  Map<String, bool> syncMap = {};
+  Map<String, int> syncMap = {};
 
   VisitSyncStatus();
 
@@ -28,7 +28,5 @@ class VisitSyncStatus {
   /// helper method `_$UserToJson`.
   Map<String, dynamic> toJson() => _$VisitSyncStatusToJson(this);
 
-  void readFromFile() {}
 
-  void savetoFile() {}
 }

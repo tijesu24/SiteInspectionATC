@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:sitecheck3/models/file_storage.dart';
 import 'package:sitecheck3/models/site_visit.dart';
 import 'package:sitecheck3/services/onlinedatabase.dart';
 import 'package:sitecheck3/services/visit_database.dart';
@@ -33,6 +34,9 @@ class _SavedVisitState extends State<SavedVisit> {
   List<int> syncStatus;
   String userEmail;
   OnlineDatabase _onlineDatabase;
+
+  
+  
 
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 
@@ -148,7 +152,7 @@ class _SavedVisitState extends State<SavedVisit> {
                                     icon: (syncStatus[index] == null)
                                         ? Icon(Icons.ac_unit)
                                         : Icon([
-                                            Icons.cancel,
+                                            Icons.cloud_off,
                                             Icons.cached,
                                             Icons.check
                                           ][syncStatus[index] - 1]),

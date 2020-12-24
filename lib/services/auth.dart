@@ -67,4 +67,8 @@ class AuthService {
       return null;
     }
   }
+
+  Future<void> resetPassword(String email) {
+    return _auth.sendPasswordResetEmail(email: email);
+  }
 }

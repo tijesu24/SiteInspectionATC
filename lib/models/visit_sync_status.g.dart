@@ -9,7 +9,7 @@ part of 'visit_sync_status.dart';
 VisitSyncStatus _$VisitSyncStatusFromJson(Map<String, dynamic> json) {
   return VisitSyncStatus()
     ..syncMap = (json['syncMap'] as Map<String, dynamic>)?.map(
-      (k, e) => MapEntry(k, e as bool),
+      (k, e) => MapEntry(k, e as int),
     );
 }
 

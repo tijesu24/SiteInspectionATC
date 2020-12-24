@@ -1,3 +1,4 @@
+import 'package:sitecheck3/screens/authenticate/forgot_password.dart';
 import 'package:sitecheck3/services/auth.dart';
 import 'package:sitecheck3/shared/constants.dart';
 import 'package:sitecheck3/shared/loading.dart';
@@ -49,7 +50,8 @@ class _SignInState extends State<SignIn> {
                     TextFormField(
                       decoration:
                           textInputDecoration.copyWith(hintText: 'email'),
-                      validator: (val) => val.isEmpty ? 'Enter an email' : null,
+                      validator: (val) =>
+                          validateEmail(val) ? null : 'Enter an email',
                       onChanged: (val) {
                         setState(() => email = val);
                       },
@@ -65,6 +67,18 @@ class _SignInState extends State<SignIn> {
                       onChanged: (val) {
                         setState(() => password = val);
                       },
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => ForgotPassword(_auth)));
+                      },
+                      child: Text(
+                        "Forgot Password ? Reset Now",
+                        style: TextStyle(color: Colors.white),
+                      ),
                     ),
                     SizedBox(height: 20.0),
                     RaisedButton(
