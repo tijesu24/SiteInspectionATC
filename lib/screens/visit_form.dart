@@ -64,186 +64,200 @@ class VisitFormState extends State<VisitForm> {
   Widget setUp(BuildContext context) {
     return Form(
         key: _formKey,
-        child: SingleChildScrollView(
-            child:
-                Column(crossAxisAlignment: CrossAxisAlignment.start, children: <
-                    Widget>[
-          TextFormField(
-              //site ID
-              initialValue: _thisVisit.siteId,
-              decoration: InputDecoration(labelText: 'Site Id'),
-              validator: (value) {
-                if (value.isEmpty) {
-                  return 'Please enter site ID';
-                }
-                return null;
-              },
-              onSaved: (val) => setState(() => _thisVisit.siteId = val.trim())),
+        child: Container(
+          margin: EdgeInsets.all(24),
+          child: SingleChildScrollView(child: createVisitForm(context)),
+        ));
+  }
 
-          TextFormField(
-              controller: dateCtl,
-              decoration: InputDecoration(
-                labelText: "Date of visit",
-                hintText: "Insert the Date of Visit",
-              ),
-              onTap: () async {
-                DateTime date = DateTime.parse(dateCtl.text);
-                FocusScope.of(context).requestFocus(new FocusNode());
+  Widget createVisitForm(BuildContext context) {
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: <
+        Widget>[
+      TextFormField(
+          //site ID
+          initialValue: _thisVisit.siteId,
+          decoration: InputDecoration(labelText: 'Site Id'),
+          validator: (value) {
+            if (value.isEmpty) {
+              return 'Please enter site ID';
+            }
+            return null;
+          },
+          onSaved: (val) => setState(() => _thisVisit.siteId = val.trim())),
 
-                date = await showDatePicker(
-                    context: context,
-                    initialDate: date,
-                    firstDate: DateTime(2000),
-                    lastDate: DateTime.now());
-
-                if (date != null) dateCtl.text = date.toIso8601String();
-              }),
-
-          Row(
-            children: <Widget>[
-              Expanded(
-                flex: 2,
-                child: TextFormField(
-                    //DG Capacity
-                    initialValue: _thisVisit.dgCapacity != null
-                        ? _thisVisit.dgCapacity.toString()
-                        : '',
-                    decoration: InputDecoration(labelText: 'DG Capacity'),
-                    validator: (value) {
-                      if (value.isEmpty) {
-                        return fillErrorMessage;
-                      }
-                      if (double.tryParse(value) == null) {
-                        return numErrorMessage;
-                      }
-                      return null;
-                    },
-                    keyboardType: TextInputType.number,
-                    onSaved: (val) => setState(
-                        () => _thisVisit.dgCapacity = double.tryParse(val))),
-              ),
-              Expanded(flex: 1, child: Text('KVA', style: textStyle))
-            ],
+      TextFormField(
+          controller: dateCtl,
+          decoration: InputDecoration(
+            labelText: "Date of visit",
+            hintText: "Insert the Date of Visit",
           ),
+          onTap: () async {
+            DateTime date = DateTime.parse(dateCtl.text);
+            FocusScope.of(context).requestFocus(new FocusNode());
 
-          Row(
-            children: <Widget>[
-              Expanded(
-                flex: 2,
-                child: TextFormField(
-                    //Gen RH
-                    initialValue: _thisVisit.genRH != null
-                        ? _thisVisit.genRH.toString()
-                        : '',
-                    decoration: InputDecoration(labelText: 'Gen Run Hour'),
-                    validator: (value) {
-                      if (value.isEmpty) {
-                        return fillErrorMessage;
-                      }
-                      if (double.tryParse(value) == null) {
-                        return numErrorMessage;
-                      }
-                      return null;
-                    },
-                    keyboardType: TextInputType.number,
-                    onSaved: (val) => setState(
-                        () => _thisVisit.genRH = double.tryParse(val))),
-              ),
-              Expanded(flex: 1, child: Text('hrs', style: textStyle))
-            ],
-          ),
+            date = await showDatePicker(
+                context: context,
+                initialDate: date,
+                firstDate: DateTime(2000),
+                lastDate: DateTime.now());
 
-          Row(
-            children: <Widget>[
-              Expanded(
-                flex: 2,
-                child: TextFormField(
-                    //Last PPM
-                    initialValue: _thisVisit.lastPPM != null
-                        ? _thisVisit.lastPPM.toString()
-                        : '',
-                    decoration: InputDecoration(labelText: 'Last PPM (RH)'),
-                    validator: (value) {
-                      if (value.isEmpty) {
-                        return fillErrorMessage;
-                      }
-                      if (double.tryParse(value) == null) {
-                        return numErrorMessage;
-                      }
-                      return null;
-                    },
-                    onSaved: (val) => setState(
-                        () => _thisVisit.lastPPM = double.tryParse(val))),
-              ),
-              Expanded(flex: 1, child: Text('hrs', style: textStyle))
-            ],
-          ),
+            if (date != null) dateCtl.text = date.toIso8601String();
+          }),
 
-          //DG PPM due
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 16),
-            child: Text('DG due for PPM', style: textStyle),
+      Row(
+        crossAxisAlignment: CrossAxisAlignment.baseline,
+        textBaseline: TextBaseline.ideographic,
+        children: <Widget>[
+          Expanded(
+            flex: 2,
+            child: TextFormField(
+                //DG Capacity
+                initialValue: _thisVisit.dgCapacity != null
+                    ? _thisVisit.dgCapacity.toString()
+                    : '',
+                decoration: InputDecoration(labelText: 'DG Capacity'),
+                // textAlignVertical: TextAlignVertical.bottom,
+                validator: (value) {
+                  if (value.isEmpty) {
+                    return fillErrorMessage;
+                  }
+                  if (double.tryParse(value) == null) {
+                    return numErrorMessage;
+                  }
+                  return null;
+                },
+                keyboardType: TextInputType.number,
+                onSaved: (val) => setState(
+                    () => _thisVisit.dgCapacity = double.tryParse(val))),
           ),
-          Container(
-            decoration: !dgPPMRadBtnValid ? myBoxDecoration() : null,
-            child: Row(
-              key: Key('dgDuePPM'),
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Radio(
-                  value: 0,
-                  groupValue: dgPPMRadBtn,
-                  onChanged: _handleRadioValueChange1,
-                ),
-                Text(
-                  'Yes',
-                  style: TextStyle(fontSize: 16.0),
-                ),
-                Radio(
-                  value: 1,
-                  groupValue: dgPPMRadBtn,
-                  onChanged: _handleRadioValueChange1,
-                ),
-                Text(
-                  'No',
-                  style: TextStyle(
-                    fontSize: 16.0,
-                  ),
-                ),
-              ],
+          Expanded(
+              flex: 1, child: Container(child: Text('KVA', style: textStyle)))
+        ],
+      ),
+
+      Row(
+        crossAxisAlignment: CrossAxisAlignment.baseline,
+        textBaseline: TextBaseline.ideographic,
+        children: <Widget>[
+          Expanded(
+            flex: 2,
+            child: TextFormField(
+                //Gen RH
+                initialValue:
+                    _thisVisit.genRH != null ? _thisVisit.genRH.toString() : '',
+                decoration: InputDecoration(labelText: 'Gen Run Hour'),
+                validator: (value) {
+                  if (value.isEmpty) {
+                    return fillErrorMessage;
+                  }
+                  if (double.tryParse(value) == null) {
+                    return numErrorMessage;
+                  }
+                  return null;
+                },
+                keyboardType: TextInputType.number,
+                onSaved: (val) =>
+                    setState(() => _thisVisit.genRH = double.tryParse(val))),
+          ),
+          Expanded(flex: 1, child: Text('hrs', style: textStyle))
+        ],
+      ),
+
+      Row(
+        crossAxisAlignment: CrossAxisAlignment.baseline,
+        textBaseline: TextBaseline.ideographic,
+        children: <Widget>[
+          Expanded(
+            flex: 2,
+            child: TextFormField(
+                //Last PPM
+                initialValue: _thisVisit.lastPPM != null
+                    ? _thisVisit.lastPPM.toString()
+                    : '',
+                decoration: InputDecoration(labelText: 'Last PPM (RH)'),
+                validator: (value) {
+                  if (value.isEmpty) {
+                    return fillErrorMessage;
+                  }
+                  if (double.tryParse(value) == null) {
+                    return numErrorMessage;
+                  }
+                  return null;
+                },
+                onSaved: (val) =>
+                    setState(() => _thisVisit.lastPPM = double.tryParse(val))),
+          ),
+          Expanded(flex: 1, child: Text('hrs', style: textStyle))
+        ],
+      ),
+
+      //DG PPM due
+      Padding(
+        padding: const EdgeInsets.symmetric(vertical: 16),
+        child: Text('DG due for PPM', style: textStyle),
+      ),
+      Container(
+        decoration: !dgPPMRadBtnValid ? myBoxDecoration() : null,
+        child: Row(
+          key: Key('dgDuePPM'),
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Radio(
+              value: 0,
+              groupValue: dgPPMRadBtn,
+              onChanged: _handleRadioValueChange1,
             ),
-          ),
+            Text(
+              'Yes',
+              style: TextStyle(fontSize: 16.0),
+            ),
+            Radio(
+              value: 1,
+              groupValue: dgPPMRadBtn,
+              onChanged: _handleRadioValueChange1,
+            ),
+            Text(
+              'No',
+              style: TextStyle(
+                fontSize: 16.0,
+              ),
+            ),
+          ],
+        ),
+      ),
 
-          Row(
+      Row(
+          crossAxisAlignment: CrossAxisAlignment.baseline,
+          textBaseline: TextBaseline.ideographic,
+          children: [
+            Expanded(
+              flex: 2,
+              child: TextFormField(
+                  //Frequency
+                  initialValue:
+                      _thisVisit.freq != null ? _thisVisit.freq.toString() : '',
+                  decoration: InputDecoration(labelText: 'Frequency'),
+                  validator: (value) {
+                    if (value.isEmpty) {
+                      return fillErrorMessage;
+                    }
+                    if (double.tryParse(value) == null) {
+                      return numErrorMessage;
+                    }
+                    return null;
+                  },
+                  keyboardType: TextInputType.number,
+                  onSaved: (val) =>
+                      setState(() => _thisVisit.freq = double.tryParse(val))),
+            ),
+            Expanded(flex: 1, child: Text('Hz', style: textStyle))
+          ]),
 
-              // mainAxisSize: MainAxisSize.max,
-              // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                Expanded(
-                  flex: 2,
-                  child: TextFormField(
-                      //Frequency
-                      initialValue: _thisVisit.freq != null
-                          ? _thisVisit.freq.toString()
-                          : '',
-                      decoration: InputDecoration(labelText: 'Frequency'),
-                      validator: (value) {
-                        if (value.isEmpty) {
-                          return fillErrorMessage;
-                        }
-                        if (double.tryParse(value) == null) {
-                          return numErrorMessage;
-                        }
-                        return null;
-                      },
-                      keyboardType: TextInputType.number,
-                      onSaved: (val) => setState(
-                          () => _thisVisit.freq = double.tryParse(val))),
-                ),
-                Expanded(flex: 1, child: Text('Hz', style: textStyle))
-              ]),
-
-          Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
+      Row(
+          crossAxisAlignment: CrossAxisAlignment.baseline,
+          textBaseline: TextBaseline.ideographic,
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
             Expanded(
                 flex: 2,
                 child: TextFormField(
@@ -273,222 +287,247 @@ class VisitFormState extends State<VisitForm> {
                 )))
           ]),
 
-          //PHCN Functional
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 16),
-            child: Text('PHCN Functional', style: textStyle),
-          ),
-          Container(
-            decoration: !phcnRadBtnValid ? myBoxDecoration() : null,
-            child: Row(
-              key: Key('phcnOk'),
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Radio(
-                  value: 0,
-                  groupValue: phcnRadBtn,
-                  onChanged: _handleRadioValueChange4,
-                ),
-                Text(
-                  'Yes',
-                  style: TextStyle(fontSize: 16.0),
-                ),
-                Radio(
-                  value: 1,
-                  groupValue: phcnRadBtn,
-                  onChanged: _handleRadioValueChange4,
-                ),
-                Text(
-                  'No',
-                  style: TextStyle(
-                    fontSize: 16.0,
-                  ),
-                ),
-              ],
+      //PHCN Functional
+      Padding(
+        padding: const EdgeInsets.symmetric(vertical: 16),
+        child: Text('PHCN Functional', style: textStyle),
+      ),
+      Container(
+        decoration: !phcnRadBtnValid ? myBoxDecoration() : null,
+        child: Row(
+          key: Key('phcnOk'),
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Radio(
+              value: 0,
+              groupValue: phcnRadBtn,
+              onChanged: _handleRadioValueChange4,
             ),
-          ),
-
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 16),
-            child: Text('Hybrid Functional', style: textStyle),
-          ),
-          Container(
-            decoration: !hybridRadBtnValid ? myBoxDecoration() : null,
-            child: Row(
-              key: Key('hybridOk'),
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Radio(
-                  value: 0,
-                  groupValue: hybridRadBtn,
-                  onChanged: _handleRadioValueChange5,
-                ),
-                Text(
-                  'Yes',
-                  style: TextStyle(fontSize: 16.0),
-                ),
-                Radio(
-                  value: 1,
-                  groupValue: hybridRadBtn,
-                  onChanged: _handleRadioValueChange5,
-                ),
-                Text(
-                  'No',
-                  style: TextStyle(
-                    fontSize: 16.0,
-                  ),
-                ),
-              ],
+            Text(
+              'Yes',
+              style: TextStyle(fontSize: 16.0),
             ),
-          ),
-
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Expanded(
-                  flex: 2,
-                  child: TextFormField(
-                      //DG Amps
-                      initialValue: _thisVisit.dgACLoad != null
-                          ? _thisVisit.dgACLoad.toString()
-                          : '',
-                      decoration: InputDecoration(labelText: 'DG AC Load'),
-                      validator: (value) {
-                        if (value.isEmpty) {
-                          return fillErrorMessage;
-                        }
-                        if (double.tryParse(value) == null) {
-                          return numErrorMessage;
-                        }
-                        return null;
-                      },
-                      keyboardType: TextInputType.number,
-                      onSaved: (val) => setState(
-                          () => _thisVisit.dgACLoad = double.tryParse(val)))),
-              Expanded(flex: 1, child: Text('Amps', style: textStyle))
-            ],
-          ),
-
-          //Radiator Status
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 16),
-            child: Text('Radiator Status', style: textStyle),
-          ),
-          Container(
-            decoration: !radiatorRadBtnValid ? myBoxDecoration() : null,
-            child: Row(
-              key: Key('radOk'),
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Radio(
-                  value: 0,
-                  groupValue: radiatorRadBtn,
-                  onChanged: _handleRadioValueChange3,
-                ),
-                Text(
-                  'Ok',
-                  style: TextStyle(fontSize: 16.0),
-                ),
-                Radio(
-                  value: 1,
-                  groupValue: radiatorRadBtn,
-                  onChanged: _handleRadioValueChange3,
-                ),
-                Text(
-                  'Not Ok',
-                  style: TextStyle(
-                    fontSize: 16.0,
-                  ),
-                ),
-              ],
+            Radio(
+              value: 1,
+              groupValue: phcnRadBtn,
+              onChanged: _handleRadioValueChange4,
             ),
-          ),
-
-          //Engine Oil Level
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 16),
-            child: Text('Engine Oil Level', style: textStyle),
-          ),
-          Container(
-            decoration: !engOilRadBtnValid ? myBoxDecoration() : null,
-            child: Row(
-              key: Key('engOilOk'),
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Radio(
-                  value: 0,
-                  groupValue: engOilRadBtn,
-                  onChanged: _handleRadioValueChange2,
-                ),
-                Text(
-                  'Ok',
-                  style: TextStyle(fontSize: 16.0),
-                ),
-                Radio(
-                  value: 1,
-                  groupValue: engOilRadBtn,
-                  onChanged: _handleRadioValueChange2,
-                ),
-                Text(
-                  'Not Ok',
-                  style: TextStyle(
-                    fontSize: 16.0,
-                  ),
-                ),
-              ],
+            Text(
+              'No',
+              style: TextStyle(
+                fontSize: 16.0,
+              ),
             ),
-          ),
+          ],
+        ),
+      ),
 
-          //Diesel dip
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 16),
-            child: Text('Diesel level (Tank Dip)', style: textStyle),
-          ),
-          Row(
-            children: <Widget>[
-              Expanded(
-                  flex: 2,
-                  child: TextFormField(
-                      initialValue: _thisVisit.dieselDipcm != null
-                          ? _thisVisit.dieselDipcm.toString()
-                          : '',
-                      validator: (value) {
-                        if (value.isEmpty) {
-                          return fillErrorMessage;
-                        }
-                        if (double.tryParse(value) == null) {
-                          return numErrorMessage;
-                        }
-                        return null;
-                      },
-                      keyboardType: TextInputType.number, //dipcm
-                      onSaved: (val) => setState(() =>
-                          _thisVisit.dieselDipcm = double.tryParse(val)))),
-              Text('cm', style: textStyle),
-              Expanded(
-                  flex: 2,
-                  child: TextFormField(
-                      //diplts
-                      initialValue: _thisVisit.dieselDipLts != null
-                          ? _thisVisit.dieselDipLts.toString()
-                          : '',
-                      validator: (value) {
-                        if (value.isEmpty) {
-                          return fillErrorMessage;
-                        }
-                        if (double.tryParse(value) == null) {
-                          return numErrorMessage;
-                        }
-                        return null;
-                      },
-                      keyboardType: TextInputType.number,
-                      onSaved: (val) => setState(() =>
-                          _thisVisit.dieselDipLts = double.tryParse(val)))),
-              Text('litres', style: textStyle)
-            ],
-          ),
+      Padding(
+        padding: const EdgeInsets.symmetric(vertical: 16),
+        child: Text('Hybrid Functional', style: textStyle),
+      ),
+      Container(
+        decoration: !hybridRadBtnValid ? myBoxDecoration() : null,
+        child: Row(
+          key: Key('hybridOk'),
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Radio(
+              value: 0,
+              groupValue: hybridRadBtn,
+              onChanged: _handleRadioValueChange5,
+            ),
+            Text(
+              'Yes',
+              style: TextStyle(fontSize: 16.0),
+            ),
+            Radio(
+              value: 1,
+              groupValue: hybridRadBtn,
+              onChanged: _handleRadioValueChange5,
+            ),
+            Text(
+              'No',
+              style: TextStyle(
+                fontSize: 16.0,
+              ),
+            ),
+          ],
+        ),
+      ),
 
-          Row(children: [
+      Row(
+        crossAxisAlignment: CrossAxisAlignment.baseline,
+        textBaseline: TextBaseline.ideographic,
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          Expanded(
+              flex: 2,
+              child: TextFormField(
+                  //DG Amps
+                  initialValue: _thisVisit.dgACLoad != null
+                      ? _thisVisit.dgACLoad.toString()
+                      : '',
+                  decoration: InputDecoration(labelText: 'DG AC Load'),
+                  validator: (value) {
+                    if (value.isEmpty) {
+                      return fillErrorMessage;
+                    }
+                    if (double.tryParse(value) == null) {
+                      return numErrorMessage;
+                    }
+                    return null;
+                  },
+                  keyboardType: TextInputType.number,
+                  onSaved: (val) => setState(
+                      () => _thisVisit.dgACLoad = double.tryParse(val)))),
+          Expanded(flex: 1, child: Text('Amps', style: textStyle))
+        ],
+      ),
+
+      //Radiator Status
+      Padding(
+        padding: const EdgeInsets.symmetric(vertical: 16),
+        child: Text('Radiator Status', style: textStyle),
+      ),
+      Container(
+        decoration: !radiatorRadBtnValid ? myBoxDecoration() : null,
+        child: Row(
+          key: Key('radOk'),
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Radio(
+              value: 0,
+              groupValue: radiatorRadBtn,
+              onChanged: _handleRadioValueChange3,
+            ),
+            Text(
+              'Ok',
+              style: TextStyle(fontSize: 16.0),
+            ),
+            Radio(
+              value: 1,
+              groupValue: radiatorRadBtn,
+              onChanged: _handleRadioValueChange3,
+            ),
+            Text(
+              'Not Ok',
+              style: TextStyle(
+                fontSize: 16.0,
+              ),
+            ),
+          ],
+        ),
+      ),
+
+      //Engine Oil Level
+      Padding(
+        padding: const EdgeInsets.symmetric(vertical: 16),
+        child: Text('Engine Oil Level', style: textStyle),
+      ),
+      Container(
+        decoration: !engOilRadBtnValid ? myBoxDecoration() : null,
+        child: Row(
+          key: Key('engOilOk'),
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Radio(
+              value: 0,
+              groupValue: engOilRadBtn,
+              onChanged: _handleRadioValueChange2,
+            ),
+            Text(
+              'Ok',
+              style: TextStyle(fontSize: 16.0),
+            ),
+            Radio(
+              value: 1,
+              groupValue: engOilRadBtn,
+              onChanged: _handleRadioValueChange2,
+            ),
+            Text(
+              'Not Ok',
+              style: TextStyle(
+                fontSize: 16.0,
+              ),
+            ),
+          ],
+        ),
+      ),
+
+      //Diesel dip
+      Padding(
+        padding: const EdgeInsets.symmetric(vertical: 16),
+        child: Text('Diesel level (Tank Dip)', style: textStyle),
+      ),
+      Row(
+        children: [
+          /* Expanded(
+            flex: 3,
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                children: <Widget>[
+                  Expanded(
+                      flex: 2,
+                      child: TextFormField(
+                          initialValue: _thisVisit.dieselDipcm != null
+                              ? _thisVisit.dieselDipcm.toString()
+                              : '',
+                          decoration: InputDecoration(isDense: true),
+                          validator: (value) {
+                            if (value.isEmpty) {
+                              return fillErrorMessage;
+                            }
+
+                            if (double.tryParse(value) == null) {
+                              return numErrorMessage;
+                            }
+
+                            return null;
+                          },
+                          keyboardType: TextInputType.number, //dipcm
+
+                          onSaved: (val) => setState(() =>
+                              _thisVisit.dieselDipcm = double.tryParse(val)))),
+                  Expanded(child: Text('cm', style: textStyle)),
+                ],
+              ),
+            ),
+          ), */
+          // Text("data"),
+          Expanded(
+              flex: 2,
+              child: TextFormField(
+
+                  //diplts
+
+                  initialValue: _thisVisit.dieselDipLts != null
+                      ? _thisVisit.dieselDipLts.toString()
+                      : '',
+                  decoration: InputDecoration(isDense: true),
+                  validator: (value) {
+                    if (value.isEmpty) {
+                      return fillErrorMessage;
+                    }
+
+                    if (double.tryParse(value) == null) {
+                      return numErrorMessage;
+                    }
+
+                    return null;
+                  },
+                  keyboardType: TextInputType.number,
+                  onSaved: (val) => setState(
+                      () => _thisVisit.dieselDipLts = double.tryParse(val)))),
+          Expanded(child: Text('litres', style: textStyle))
+        ],
+      ),
+
+      Row(
+          crossAxisAlignment: CrossAxisAlignment.baseline,
+          textBaseline: TextBaseline.ideographic,
+          children: [
             Expanded(
                 flex: 2,
                 child: TextFormField(
@@ -510,7 +549,10 @@ class VisitFormState extends State<VisitForm> {
             Expanded(flex: 1, child: Text('litres', style: textStyle))
           ]),
 
-          Row(children: [
+      Row(
+          crossAxisAlignment: CrossAxisAlignment.baseline,
+          textBaseline: TextBaseline.ideographic,
+          children: [
             Expanded(
                 flex: 2,
                 child: TextFormField(
@@ -533,166 +575,165 @@ class VisitFormState extends State<VisitForm> {
                         () => _thisVisit.dcLoad = double.tryParse(val)))),
             Expanded(flex: 1, child: Text('A', style: textStyle))
           ]),
-          TextFormField(
-              //No of working modules
-              initialValue: _thisVisit.moduleNo != null
-                  ? _thisVisit.moduleNo.toString()
-                  : '',
-              decoration: InputDecoration(labelText: 'No of working modules'),
-              validator: (value) {
-                if (value.isEmpty) {
-                  return fillErrorMessage;
-                }
-                if (double.tryParse(value) == null) {
-                  return numErrorMessage;
-                }
-                return null;
-              },
-              keyboardType: TextInputType.number,
-              onSaved: (val) =>
-                  setState(() => _thisVisit.moduleNo = double.tryParse(val))),
+      TextFormField(
+          //No of working modules
+          initialValue:
+              _thisVisit.moduleNo != null ? _thisVisit.moduleNo.toString() : '',
+          decoration: InputDecoration(labelText: 'No of working modules'),
+          validator: (value) {
+            if (value.isEmpty) {
+              return fillErrorMessage;
+            }
+            if (double.tryParse(value) == null) {
+              return numErrorMessage;
+            }
+            return null;
+          },
+          keyboardType: TextInputType.number,
+          onSaved: (val) =>
+              setState(() => _thisVisit.moduleNo = double.tryParse(val))),
 
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 16),
-            child: Text('Security light status', style: textStyle),
-          ),
-          Container(
-            decoration: !secLtRadBtnValid ? myBoxDecoration() : null,
-            child: Row(
-              key: Key('secLtOk'),
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Radio(
-                  value: 0,
-                  groupValue: secLtRadBtn,
-                  onChanged: _handleRadioValueChange6,
-                ),
-                Text(
-                  'NA',
-                  style: TextStyle(fontSize: 16.0),
-                ),
-                Radio(
-                  value: 1,
-                  groupValue: secLtRadBtn,
-                  onChanged: _handleRadioValueChange6,
-                ),
-                Text(
-                  'Ok',
-                  style: TextStyle(fontSize: 16.0),
-                ),
-                Radio(
-                  value: 2,
-                  groupValue: secLtRadBtn,
-                  onChanged: _handleRadioValueChange6,
-                ),
-                Text(
-                  'Not Ok',
-                  style: TextStyle(
-                    fontSize: 16.0,
-                  ),
-                ),
-              ],
+      Padding(
+        padding: const EdgeInsets.symmetric(vertical: 16),
+        child: Text('Security light status', style: textStyle),
+      ),
+      Container(
+        decoration: !secLtRadBtnValid ? myBoxDecoration() : null,
+        child: Row(
+          key: Key('secLtOk'),
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Radio(
+              value: 0,
+              groupValue: secLtRadBtn,
+              onChanged: _handleRadioValueChange6,
             ),
-          ),
-
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 16),
-            child: Text('Aviation light status', style: textStyle),
-          ),
-          Container(
-            decoration: !aviLtRadBtnValid ? myBoxDecoration() : null,
-            child: Row(
-              key: Key('avLtOk'),
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Radio(
-                  value: 0,
-                  groupValue: aviLtRadBtn,
-                  onChanged: _handleRadioValueChange7,
-                ),
-                Text(
-                  'NA',
-                  style: TextStyle(fontSize: 16.0),
-                ),
-                Radio(
-                  value: 1,
-                  groupValue: aviLtRadBtn,
-                  onChanged: _handleRadioValueChange7,
-                ),
-                Text(
-                  'Ok',
-                  style: TextStyle(fontSize: 16.0),
-                ),
-                Radio(
-                  value: 2,
-                  groupValue: aviLtRadBtn,
-                  onChanged: _handleRadioValueChange7,
-                ),
-                Text(
-                  'Not Ok',
-                  style: TextStyle(
-                    fontSize: 16.0,
-                  ),
-                ),
-              ],
+            Text(
+              'NA',
+              style: TextStyle(fontSize: 16.0),
             ),
-          ),
-
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 16),
-            child: Text('Site Janitorial status', style: textStyle),
-          ),
-          Container(
-            decoration: !janitoRadBtnValid ? myBoxDecoration() : null,
-            child: Row(
-              key: Key('janitOk'),
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Radio(
-                  value: 0,
-                  groupValue: janitoRadBtn,
-                  onChanged: _handleRadioValueChange8,
-                ),
-                Text(
-                  'Ok',
-                  style: TextStyle(fontSize: 16.0),
-                ),
-                Radio(
-                  value: 1,
-                  groupValue: janitoRadBtn,
-                  onChanged: _handleRadioValueChange8,
-                ),
-                Text(
-                  'Not Ok',
-                  style: TextStyle(fontSize: 16.0),
-                ),
-              ],
+            Radio(
+              value: 1,
+              groupValue: secLtRadBtn,
+              onChanged: _handleRadioValueChange6,
             ),
-          ),
-
-          TextFormField(
-              //Comments
-              initialValue: _thisVisit.comment,
-              decoration: InputDecoration(labelText: 'Comments'),
-              maxLines: null,
-              onSaved: (val) => setState(() => _thisVisit.comment = val)),
-
-          RaisedButton(
-            onPressed: () => _validateInputsSave(context),
-
-            //_validateInputs,
-            child: new Text(
-              'Save Visit',
-              style: new TextStyle(
-                  fontSize: 16.0,
-                  fontWeight: FontWeight.normal,
-                  color: Colors.white),
+            Text(
+              'Ok',
+              style: TextStyle(fontSize: 16.0),
             ),
-            color: Theme.of(context).accentColor,
-            shape: new RoundedRectangleBorder(
-                borderRadius: new BorderRadius.circular(20.0)),
-          ),
-        ])));
+            Radio(
+              value: 2,
+              groupValue: secLtRadBtn,
+              onChanged: _handleRadioValueChange6,
+            ),
+            Text(
+              'Not Ok',
+              style: TextStyle(
+                fontSize: 16.0,
+              ),
+            ),
+          ],
+        ),
+      ),
+
+      Padding(
+        padding: const EdgeInsets.symmetric(vertical: 16),
+        child: Text('Aviation light status', style: textStyle),
+      ),
+      Container(
+        decoration: !aviLtRadBtnValid ? myBoxDecoration() : null,
+        child: Row(
+          key: Key('avLtOk'),
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Radio(
+              value: 0,
+              groupValue: aviLtRadBtn,
+              onChanged: _handleRadioValueChange7,
+            ),
+            Text(
+              'NA',
+              style: TextStyle(fontSize: 16.0),
+            ),
+            Radio(
+              value: 1,
+              groupValue: aviLtRadBtn,
+              onChanged: _handleRadioValueChange7,
+            ),
+            Text(
+              'Ok',
+              style: TextStyle(fontSize: 16.0),
+            ),
+            Radio(
+              value: 2,
+              groupValue: aviLtRadBtn,
+              onChanged: _handleRadioValueChange7,
+            ),
+            Text(
+              'Not Ok',
+              style: TextStyle(
+                fontSize: 16.0,
+              ),
+            ),
+          ],
+        ),
+      ),
+
+      Padding(
+        padding: const EdgeInsets.symmetric(vertical: 16),
+        child: Text('Site Janitorial status', style: textStyle),
+      ),
+      Container(
+        decoration: !janitoRadBtnValid ? myBoxDecoration() : null,
+        child: Row(
+          key: Key('janitOk'),
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Radio(
+              value: 0,
+              groupValue: janitoRadBtn,
+              onChanged: _handleRadioValueChange8,
+            ),
+            Text(
+              'Ok',
+              style: TextStyle(fontSize: 16.0),
+            ),
+            Radio(
+              value: 1,
+              groupValue: janitoRadBtn,
+              onChanged: _handleRadioValueChange8,
+            ),
+            Text(
+              'Not Ok',
+              style: TextStyle(fontSize: 16.0),
+            ),
+          ],
+        ),
+      ),
+
+      TextFormField(
+          //Comments
+          initialValue: _thisVisit.comment,
+          decoration: InputDecoration(labelText: 'Comments'),
+          maxLines: null,
+          onSaved: (val) => setState(() => _thisVisit.comment = val)),
+
+      RaisedButton(
+        onPressed: () => _validateInputsSave(context),
+
+        //_validateInputs,
+        child: new Text(
+          'Save Visit',
+          style: new TextStyle(
+              fontSize: 16.0,
+              fontWeight: FontWeight.normal,
+              color: Colors.white),
+        ),
+        color: Theme.of(context).accentColor,
+        shape: new RoundedRectangleBorder(
+            borderRadius: new BorderRadius.circular(20.0)),
+      ),
+    ]);
   }
 
   @override
