@@ -461,9 +461,10 @@ class VisitFormState extends State<VisitForm> {
         child: Text('Diesel level (Tank Dip)', style: textStyle),
       ),
       Row(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          /* Expanded(
-            flex: 3,
+          Expanded(
+            flex: 1,
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: Row(
@@ -494,33 +495,43 @@ class VisitFormState extends State<VisitForm> {
                 ],
               ),
             ),
-          ), */
-          // Text("data"),
+          ),
           Expanded(
-              flex: 2,
-              child: TextFormField(
+            flex: 1,
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Expanded(
+                      flex: 2,
+                      child: TextFormField(
 
-                  //diplts
+                          //diplts
 
-                  initialValue: _thisVisit.dieselDipLts != null
-                      ? _thisVisit.dieselDipLts.toString()
-                      : '',
-                  decoration: InputDecoration(isDense: true),
-                  validator: (value) {
-                    if (value.isEmpty) {
-                      return fillErrorMessage;
-                    }
+                          initialValue: _thisVisit.dieselDipLts != null
+                              ? _thisVisit.dieselDipLts.toString()
+                              : '',
+                          decoration: InputDecoration(isDense: true),
+                          validator: (value) {
+                            if (value.isEmpty) {
+                              return fillErrorMessage;
+                            }
 
-                    if (double.tryParse(value) == null) {
-                      return numErrorMessage;
-                    }
+                            if (double.tryParse(value) == null) {
+                              return numErrorMessage;
+                            }
 
-                    return null;
-                  },
-                  keyboardType: TextInputType.number,
-                  onSaved: (val) => setState(
-                      () => _thisVisit.dieselDipLts = double.tryParse(val)))),
-          Expanded(child: Text('litres', style: textStyle))
+                            return null;
+                          },
+                          keyboardType: TextInputType.number,
+                          onSaved: (val) => setState(() =>
+                              _thisVisit.dieselDipLts = double.tryParse(val)))),
+                  Expanded(child: Text('litres', style: textStyle)),
+                ],
+              ),
+            ),
+          )
         ],
       ),
 

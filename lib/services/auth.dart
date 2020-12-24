@@ -2,13 +2,17 @@ import 'package:firebase_auth/firebase_auth.dart' as auth;
 import 'package:sitecheck3/models/user.dart';
 
 class AuthService {
+  //Status integers
+  static const int taskDone = 0;
+  static const int errorUserNotExists = 1;
+  static const int errorUnknown = 100;
+
   final auth.FirebaseAuth _auth = auth.FirebaseAuth.instance;
   String errorMsg = "";
 
   // sign in anon
   Future signInAnon() async {
     try {
-      print('1');
       auth.UserCredential result = await _auth.signInAnonymously();
       auth.User user = result.user;
       return user;
@@ -68,7 +72,19 @@ class AuthService {
     }
   }
 
-  Future<void> resetPassword(String email) {
-    return _auth.sendPasswordResetEmail(email: email);
+  Future<int> resetPassword(String email) async {
+    int status;
+    try {
+      await _auth.sendPasswordResetEmail(email: email);
+      status = taskDone;
+    } on auth.FirebaseAuthException catch (e) {
+      print('Failed with error code: ${e.code}');
+      print(e.message);
+      if (e.code == 'user-not-found')
+        status = errorUserNotExists;
+      else
+        status = errorUnknown;
+    }
+    return status;
   }
 }
