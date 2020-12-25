@@ -57,7 +57,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                       if (_formKey.currentState.validate()) {
                         setState(() => loading = true);
                         int status = await widget._auth.resetPassword(email);
-                        createStatusDialog(status);
+                        await createStatusDialog(status);
                         Navigator.pop(context);
 
                         setState(() => loading = false);
@@ -71,7 +71,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
     );
   }
 
-  createStatusDialog(int status) {
+  Future<void> createStatusDialog(int status) async {
     // Shows dialog of status of the auth function
     String statusMessage;
     switch (status) {
@@ -87,5 +87,29 @@ class _ForgotPasswordState extends State<ForgotPassword> {
         break;
       default:
     }
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('AlertDialog Title'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text(statusMessage),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Ok'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 }
