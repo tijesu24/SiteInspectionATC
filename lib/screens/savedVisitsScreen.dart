@@ -1,5 +1,5 @@
 import 'dart:io';
-
+import 'package:share/share.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -34,9 +34,6 @@ class _SavedVisitState extends State<SavedVisit> {
   List<int> syncStatus;
   String userEmail;
   OnlineDatabase _onlineDatabase;
-
-  
-  
 
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 
@@ -77,20 +74,7 @@ class _SavedVisitState extends State<SavedVisit> {
                     icon: const Icon(Icons.add_alert),
                     tooltip: 'Add Visit',
                     onPressed: () {
-                      //Open the form and update Online database
                       openVisitFormNew();
-                      // updateOnlineDatabase();
-                    },
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.exit_to_app),
-                    tooltip: 'Next page',
-                    onPressed: () async {
-                      await widget._auth.signOut();
-                      /* dropDB();
-                setState(() {
-                  getAllVisits(); 
-                }); */
                     },
                   ),
                   IconButton(
@@ -98,6 +82,13 @@ class _SavedVisitState extends State<SavedVisit> {
                     tooltip: 'Add',
                     onPressed: () => testMultiple(),
                   ),
+                  IconButton(
+                    icon: const Icon(Icons.exit_to_app),
+                    tooltip: 'Next page',
+                    onPressed: () async {
+                      await widget._auth.signOut();
+                    },
+                  )
                 ],
               ),
               body: visitListWidget(snapshot),
@@ -169,6 +160,13 @@ class _SavedVisitState extends State<SavedVisit> {
                                           _onlineDatabase.deleteVisit(
                                               visits[index].entryuid);
                                       }),
+                                  IconButton(
+                                    icon: Icon(Icons.share),
+                                    onPressed: () async {
+                                      await shareVisit(
+                                          visits[index].textExport());
+                                    },
+                                  )
                                 ],
                               ));
                         });
@@ -428,5 +426,9 @@ class _SavedVisitState extends State<SavedVisit> {
       },
     );
     return result;
+  }
+
+  Future<void> shareVisit(textExport) async {
+    return await Share.share(textExport);
   }
 }

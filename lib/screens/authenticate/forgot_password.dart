@@ -41,9 +41,9 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                     hintText: 'Email',
                   ),
                   validator: (val) =>
-                      validateEmail(val) ? null : 'Enter an email',
+                      validateEmail(val.trim()) ? null : 'Enter an email',
                   onChanged: (val) {
-                    setState(() => email = val);
+                    setState(() => email = val.trim());
                   },
                 ),
                 SizedBox(height: 20.0),
@@ -92,7 +92,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
       barrierDismissible: false, // user must tap button!
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('AlertDialog Title'),
+          title: Text('Status'),
           content: SingleChildScrollView(
             child: ListBody(
               children: <Widget>[

@@ -1,7 +1,10 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import '../models/site_visit.dart';
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:intl/intl.dart';
+import 'package:image_picker/image_picker.dart';
 
 class VisitForm extends StatefulWidget {
   final SiteVisit visit;
@@ -24,6 +27,18 @@ class VisitFormState extends State<VisitForm> {
   int secLtRadBtn = 0;
   int aviLtRadBtn = 0;
   int janitoRadBtn = -1;
+
+  final pickerForImage = ImagePicker();
+  Map<String, File> inspectionPhotos = {};
+  List<String> descrListForImages = [];
+
+  static const String str_dgExt = "DG exterior";
+  static const String str_dgInt = "DG interior";
+  static const String str_radiator = "DG exterior";
+  static const String str_1000hr = "1000 hour kit";
+  static const String str_rectifier = "Rectifier";
+  static const String str_fullShelter = "Full shelter picture";
+  static const String str_intShelter = "Interior shelter";
 
 //I use these values in my validator function
 //If the value is false, there is a red boundary around the rad
@@ -83,7 +98,8 @@ class VisitFormState extends State<VisitForm> {
             }
             return null;
           },
-          onSaved: (val) => setState(() => _thisVisit.siteId = val.trim())),
+          onSaved: (val) =>
+              setState(() => _thisVisit.siteId = val.trim().toUpperCase())),
 
       TextFormField(
           controller: dateCtl,
@@ -729,6 +745,55 @@ class VisitFormState extends State<VisitForm> {
           maxLines: null,
           onSaved: (val) => setState(() => _thisVisit.comment = val)),
 
+      /* ListView.builder(
+        itemCount: descrListForImages.length,
+        itemBuilder: (BuildContext ctxt, int index) {
+          return Row(
+            children: [
+              DropdownButton<String>(
+                  value: descrListForImages[index],
+                  onChanged: (String newValue) {
+                    setState(() {
+                      descrListForImages[index] = newValue;
+                    });
+                  },
+                  items: <String>[
+                    str_dgExt,
+                    str_dgInt,
+                    str_radiator,
+                    str_1000hr,
+                    str_rectifier,
+                    str_fullShelter,
+                    str_intShelter
+                  ].map<DropdownMenuItem<String>>((String value) {
+                    return DropdownMenuItem<String>(
+                      value: value,
+                      child: Text(value),
+                    );
+                  }).toList()),
+
+                    
+
+                  IconButton(icon: Icon(Icons.delete),
+                  onPressed: (){
+                    setState(() {
+                                          descrListForImages.removeAt(index);
+                                        }); 
+                  },)
+
+            ],
+          );
+        },
+      ),
+      Visibility(
+        child: Text("Add picture"),
+        visible: descrListForImages.length == 0,
+      ),
+      RaisedButton(
+        child: Text("Add Picture"),
+        onPressed: () {},
+      ), */
+
       RaisedButton(
         onPressed: () => _validateInputsSave(context),
 
@@ -867,24 +932,41 @@ class VisitFormState extends State<VisitForm> {
       }
     }
   }
-}
 
-int booltoInt(bool val) {
-  if (val != null) {
-    return val ? 0 : 1;
-  } else {
-    return -1;
+  Future<File> getImage(bool sourceFromCamera) async {
+    //Decide if to get from camera or gallery
+    File image;
+    ImageSource source =
+        sourceFromCamera ? ImageSource.camera : ImageSource.gallery;
+    PickedFile pickedFile =
+        await pickerForImage.getImage(source: source, imageQuality: 50);
+
+    if (pickedFile != null) {
+      image = File(pickedFile.path);
+    } else {
+      print('No image selected.');
+    }
+
+    return image;
   }
-}
 
-BoxDecoration myBoxDecoration() {
-  return BoxDecoration(
-    border: Border.all(
-      width: 3.0,
-      color: Colors.red,
-    ),
-    borderRadius: BorderRadius.all(
-        Radius.circular(5.0) //                 <--- border radius here
-        ),
-  );
+  int booltoInt(bool val) {
+    if (val != null) {
+      return val ? 0 : 1;
+    } else {
+      return -1;
+    }
+  }
+
+  BoxDecoration myBoxDecoration() {
+    return BoxDecoration(
+      border: Border.all(
+        width: 3.0,
+        color: Colors.red,
+      ),
+      borderRadius: BorderRadius.all(
+          Radius.circular(5.0) //                 <--- border radius here
+          ),
+    );
+  }
 }

@@ -26,11 +26,11 @@ class _RegisterState extends State<Register> {
     return loading
         ? Loading()
         : Scaffold(
-            backgroundColor: Colors.brown[100],
+            // backgroundColor: Colors.brown[100],
             appBar: AppBar(
-              backgroundColor: Colors.brown[400],
+              // backgroundColor: Colors.brown[400],
               elevation: 0.0,
-              title: Text('Sign up to Brew Crew'),
+              title: Text('Register'),
               actions: <Widget>[
                 FlatButton.icon(
                   icon: Icon(Icons.person),
@@ -49,9 +49,10 @@ class _RegisterState extends State<Register> {
                     TextFormField(
                       decoration:
                           textInputDecoration.copyWith(hintText: 'email'),
-                      validator: (val) => val.isEmpty ? 'Enter an email' : null,
+                      validator: (val) =>
+                          validateEmail(val.trim()) ? null : 'Enter an email',
                       onChanged: (val) {
-                        setState(() => email = val);
+                        setState(() => email = val.trim());
                       },
                     ),
                     SizedBox(height: 20.0),

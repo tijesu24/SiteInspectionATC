@@ -27,9 +27,9 @@ class _SignInState extends State<SignIn> {
     return loading
         ? Loading()
         : Scaffold(
-            backgroundColor: Colors.brown[100],
+            // backgroundColor: Colors.brown[100],
             appBar: AppBar(
-              backgroundColor: Colors.brown[400],
+              // backgroundColor: Colors.brown[400],
               elevation: 0.0,
               title: Text('Sign in to Site Inspection'),
               actions: <Widget>[
@@ -51,9 +51,9 @@ class _SignInState extends State<SignIn> {
                       decoration:
                           textInputDecoration.copyWith(hintText: 'email'),
                       validator: (val) =>
-                          validateEmail(val) ? null : 'Enter an email',
+                          validateEmail(val.trim()) ? null : 'Enter an email',
                       onChanged: (val) {
-                        setState(() => email = val);
+                        setState(() => email = val.trim());
                       },
                     ),
                     SizedBox(height: 20.0),
@@ -77,7 +77,7 @@ class _SignInState extends State<SignIn> {
                       },
                       child: Text(
                         "Forgot Password ? Reset Now",
-                        style: TextStyle(color: Colors.white),
+                        style: TextStyle(color: Colors.blue, fontSize: 15),
                       ),
                     ),
                     SizedBox(height: 20.0),
