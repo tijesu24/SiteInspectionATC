@@ -44,69 +44,71 @@ class _SignInState extends State<SignIn> {
               padding: EdgeInsets.symmetric(vertical: 20.0, horizontal: 50.0),
               child: Form(
                 key: _formKey,
-                child: Column(
-                  children: <Widget>[
-                    SizedBox(height: 20.0),
-                    TextFormField(
-                      decoration:
-                          textInputDecoration.copyWith(hintText: 'email'),
-                      validator: (val) =>
-                          validateEmail(val.trim()) ? null : 'Enter an email',
-                      onChanged: (val) {
-                        setState(() => email = val.trim());
-                      },
-                    ),
-                    SizedBox(height: 20.0),
-                    TextFormField(
-                      obscureText: true,
-                      decoration:
-                          textInputDecoration.copyWith(hintText: 'password'),
-                      validator: (val) => val.length < 6
-                          ? 'Enter a password 6+ chars long'
-                          : null,
-                      onChanged: (val) {
-                        setState(() => password = val);
-                      },
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => ForgotPassword(_auth)));
-                      },
-                      child: Text(
-                        "Forgot Password ? Reset Now",
-                        style: TextStyle(color: Colors.blue, fontSize: 15),
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: <Widget>[
+                      SizedBox(height: 20.0),
+                      TextFormField(
+                        decoration:
+                            textInputDecoration.copyWith(hintText: 'email'),
+                        validator: (val) =>
+                            validateEmail(val.trim()) ? null : 'Enter an email',
+                        onChanged: (val) {
+                          setState(() => email = val.trim());
+                        },
                       ),
-                    ),
-                    SizedBox(height: 20.0),
-                    RaisedButton(
-                        color: Colors.pink[400],
+                      SizedBox(height: 20.0),
+                      TextFormField(
+                        obscureText: true,
+                        decoration:
+                            textInputDecoration.copyWith(hintText: 'password'),
+                        validator: (val) => val.length < 6
+                            ? 'Enter a password 6+ chars long'
+                            : null,
+                        onChanged: (val) {
+                          setState(() => password = val);
+                        },
+                      ),
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => ForgotPassword(_auth)));
+                        },
                         child: Text(
-                          'Sign In',
-                          style: TextStyle(color: Colors.white),
+                          "Forgot Password ? Reset Now",
+                          style: TextStyle(color: Colors.blue, fontSize: 15),
                         ),
-                        onPressed: () async {
-                          if (_formKey.currentState.validate()) {
-                            setState(() => loading = true);
-                            dynamic result = await _auth
-                                .signInWithEmailAndPassword(email, password);
-                            if (result == null) {
-                              setState(() {
-                                loading = false;
-                                error =
-                                    'Could not sign in with those credentials';
-                              });
+                      ),
+                      SizedBox(height: 20.0),
+                      RaisedButton(
+                          color: Colors.pink[400],
+                          child: Text(
+                            'Sign In',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                          onPressed: () async {
+                            if (_formKey.currentState.validate()) {
+                              setState(() => loading = true);
+                              dynamic result = await _auth
+                                  .signInWithEmailAndPassword(email, password);
+                              if (result == null) {
+                                setState(() {
+                                  loading = false;
+                                  error =
+                                      'Could not sign in with those credentials';
+                                });
+                              }
                             }
-                          }
-                        }),
-                    SizedBox(height: 12.0),
-                    Text(
-                      error,
-                      style: TextStyle(color: Colors.red, fontSize: 14.0),
-                    ),
-                  ],
+                          }),
+                      SizedBox(height: 12.0),
+                      Text(
+                        error,
+                        style: TextStyle(color: Colors.red, fontSize: 14.0),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),

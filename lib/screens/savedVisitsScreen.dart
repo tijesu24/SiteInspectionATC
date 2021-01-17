@@ -11,6 +11,7 @@ import 'package:sitecheck3/services/visit_database.dart';
 import 'package:sitecheck3/screens/visit_form.dart';
 import 'package:sitecheck3/services/auth.dart';
 import 'package:flutter_persistent_queue/flutter_persistent_queue.dart';
+import 'package:sitecheck3/shared/loading.dart';
 
 const List<String> events = ['new', 'update', 'delete'];
 
@@ -108,7 +109,7 @@ class _SavedVisitState extends State<SavedVisit> {
         builder: (context, futureSnap) {
           switch (futureSnap.connectionState) {
             case ConnectionState.waiting:
-              return Text("Loading");
+              return Loading();
             default:
               if (!futureSnap.hasError) {
                 if (visits == null)

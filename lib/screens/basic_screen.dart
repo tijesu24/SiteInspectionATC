@@ -10,11 +10,6 @@ class _BasicPageState extends State<BasicPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(title: Text('Basic')),
-        body: Container(
-            padding: EdgeInsets.all(20),
-            
-            child: Text('I love you')
-      
-    ));
+        body: Container(padding: EdgeInsets.all(20), child: Text("Hi")));
   }
 }
